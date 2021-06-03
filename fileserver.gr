@@ -1,0 +1,59 @@
+// This is a simple Wagi static file server.
+
+import Env from "./env"
+import Map from "map"
+import Option from "option"
+import File from "sys/file"
+import String from "string"
+
+let serve = (path) => {
+    File.fdWrite(File.stderr, "Loading file ")
+    File.fdWrite(File.stderr, path)
+    File.fdWrite(File.stderr, "\n")
+
+    // Open file
+    // TODO: This throws an error when something goes wrong.
+    // But Grain 0.3 does not have a try/catch yet.
+    // When we figure out how, we need to catch the error here
+    // and do a 404 or 500.
+    let input = File.pathOpen(
+        File.pwdfd,
+        [],
+        path,
+        [],
+        [File.FdRead],
+        [],
+        [],   
+    )
+
+    File.fdWrite(File.stdout, "Content-Type: text/plain\n\n")
+    
+    // Pipe output to STDOUT
+    let rec pipe = (in, out) => {
+        let (d, len) = File.fdRead(in, 1024)
+        File.fdWrite(out, d)
+        if (len > 0) {
+            pipe(in, out)
+        }
+    }
+    pipe(input, File.stdout)
+    File.fdClose(input)
+}
+
+let guestpath = (env) => {
+    let req = Option.unwrap(Map.get("PATH_INFO", env))
+    let mut base = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
+    let dots = String.indexOf("/...", base)
+    if (Option.isSome(dots) ) {
+        base = String.slice(0, Option.unwrap(dots), base)
+    }
+    String.slice(String.length(base) + 1, String.length(req), req)
+}
+
+let notFound = () => {
+    File.fdWrite(File.stdout, "Status: 404\n\nNot Found")
+}
+
+let kv = Env.envMap()
+let pathInfo = guestpath(kv)
+serve(pathInfo)
