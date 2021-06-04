@@ -14,13 +14,13 @@ jobs:
         with:
           name: "grain"
           url: "https://github.com/grain-lang/grain/releases/download/grain-v0.3.2/grain-linux-x64"
-      - uses: engineerd/configurator@v0.0.7
-        with:
-          name: "wasmtime"
-          url: "https://github.com/bytecodealliance/wasmtime/releases/download/v0.27.0/wasmtime-v0.27.0-x86_64-linux.tar.xz?.tar.gz"
-          pathInArchive: wasmtime
+      #- uses: engineerd/configurator@v0.0.7
+      #  with:
+      #    name: "wasmtime"
+      #    url: "https://github.com/bytecodealliance/wasmtime/releases/download/v0.27.0/wasmtime-v0.27.0-x86_64-linux.tar.xz?.tar.gz"
+      #    pathInArchive: wasmtime
       - name: Testing
         run: |
-          wasmtime --version
+          # wasmtime --version
           grain --version
-          make test
+          make test-unit
