@@ -7,6 +7,10 @@ A [Wagi](https://github.com/deislabs/wagi) static fileserver written in Grain.
 > of WebAssembly as a cloud-based runtime. This code is not stable or
 > production ready.
 
+## Getting a Binary
+
+We periodically release Wasm modules in binary form. To get the latest, go to the [releases page](https://github.com/deislabs/wagi-fileserver/releases). In the future, we will also publish bindles.
+
 ## Building and Running Locally
 
 You will need the [Grain](https://grain-lang.org) toolkit to work with this repo.
