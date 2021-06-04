@@ -19,6 +19,7 @@ jobs:
       #    name: "wasmtime"
       #    url: "https://github.com/bytecodealliance/wasmtime/releases/download/v0.27.0/wasmtime-v0.27.0-x86_64-linux.tar.xz?.tar.gz"
       #    pathInArchive: wasmtime
+      - uses: actions/checkout@v2
       - name: Testing
         run: |
           # wasmtime --version
