@@ -4,7 +4,8 @@ import Option from "option"
 import Map from "map"
 import {lastIndexOf, reverse} from "./stringutil"
 
-let default_mt = "application/octet-stream"
+export let default_mt = "application/octet-stream"
+
 let mut mediatypes = Map.make()
 
 // Text formats
