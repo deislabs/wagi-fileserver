@@ -27,10 +27,26 @@ To compile:
 $ make build
 ```
 
-To run test (Wasmtime required):
+You can run unit tests with `make test-unit` or full tests with `make test`:
 
 ```
 $ make test
+grain compile fileserver.gr
+grain tests.gr
+✅ PASS         Env.splitEnvVar should parse
+✅ PASS         Util.reverse should reverse string
+✅ PASS         Util.lastIndexOf should find Some
+===== Expected: =====
+Some(19)
+======= Got: ========
+Some(18)
+=====================
+⛔️ FAIL         UtillastIndexOf should find Some
+✅ PASS         Util.lastIndexOf should find None
+✅ PASS         Mediatype.guess should find text/plain
+✅ PASS         Mediatype.guess should find default type
+❌ Total failed tests: 1❌
+make: *** [test-unit] Error 1
 ```
 
 ## Running in Wagi

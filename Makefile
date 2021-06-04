@@ -15,11 +15,12 @@ build:
 .PHONY: test-unit
 test-unit:
 	grain tests.gr
-	
+
 .PHONY: test
 test:build
 test: test-unit
 test:
+	@echo EXPECT: Loading file fileserver.gr
 	wasmtime --dir . --env PATH_INFO=${PATH_INFO} \
 	--env X_MATCHED_ROUTE=${X_MATCHED_ROUTE} \
 	fileserver.gr.wasm > /dev/null

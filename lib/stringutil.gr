@@ -16,15 +16,35 @@ export let reverse = (str: String) => {
 }
 
 // Get the index of the last appearance of needle in the haystack.
+//
+// For a multi-character needle, this will return the end of that sequence,
+// not the beginning (as indexOf does).
+//
 // @param needle: The string to search for
 // @param haystack: The string to be searched
 // @return Option<Number> The offset, if found, or a number
 export let lastIndexOf = (needle: String, haystack: String) => {
     let rev = reverse(haystack)
     let revNeedle = reverse(needle)
+    let nlen = String.length(needle)
     let i = String.indexOf(revNeedle, rev)
     match (i) {
         Some(offset) => Some(String.length(haystack) - 1 - offset),
         None => None,   
+    }
+}
+
+export let afterLast = (needle: String, haystack: String) => {
+    match (lastIndexOf(needle, haystack)) {
+        Some(index) => String.slice(index + 1, String.length(haystack), haystack),
+        None => haystack
+    }
+}
+
+export let beforeLast = (needle: String, haystack: String) => {
+    let nlen = String.length(needle)
+    match (lastIndexOf(needle, haystack)) {
+        Some(index) => String.slice(0, index + 1 - nlen, haystack),
+        None => haystack
     }
 }

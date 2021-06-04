@@ -6,6 +6,7 @@ import Option from "option"
 import File from "sys/file"
 import String from "string"
 import Mediatype from "./lib/mediatype"
+import Stringutil from "./lib/stringutil"
 
 let serve = (path) => {
     File.fdWrite(File.stderr, "Fileserver: Loading file ")
@@ -45,11 +46,8 @@ let serve = (path) => {
 
 let guestpath = (env) => {
     let req = Option.unwrap(Map.get("PATH_INFO", env))
-    let mut base = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
-    let dots = String.indexOf("/...", base)
-    if (Option.isSome(dots) ) {
-        base = String.slice(0, Option.unwrap(dots), base)
-    }
+    let matched = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
+    let base = Stringutil.beforeLast("/...", matched)
     String.slice(String.length(base) + 1, String.length(req), req)
 }
 
