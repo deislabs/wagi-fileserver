@@ -2,6 +2,9 @@ import String from "string"
 import Array from "array"
 
 // Return a String that is the reverse of the given String.
+//
+// @param str: The string to reverse.
+// @return String A reversed version of the given string
 export let reverse = (str: String) => {
     let chars = String.explode(str)
     let clen = Array.length(chars)
@@ -15,9 +18,11 @@ export let reverse = (str: String) => {
 // Get the index of the last appearance of needle in the haystack.
 // @param needle: The string to search for
 // @param haystack: The string to be searched
+// @return Option<Number> The offset, if found, or a number
 export let lastIndexOf = (needle: String, haystack: String) => {
     let rev = reverse(haystack)
-    let i = String.indexOf(needle, rev)
+    let revNeedle = reverse(needle)
+    let i = String.indexOf(revNeedle, rev)
     match (i) {
         Some(offset) => Some(String.length(haystack) - 1 - offset),
         None => None,   

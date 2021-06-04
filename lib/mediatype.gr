@@ -6,6 +6,7 @@ import {lastIndexOf, reverse} from "./lib/stringutil"
 
 export let default_mt = "application/octet-stream"
 
+// A giant map of all of the media types we know about.
 let mut mediatypes = Map.make()
 
 // Text formats
@@ -102,7 +103,12 @@ Map.set("woff", "font/woff", mediatypes)
 Map.set("woff2", "font/woff2", mediatypes)
 
 // Guess the media type of this file
+//
+// Per recommendation, if no media type is found for an extension,
+// this returns `application/octet-stream`.
+//
 // @param filename: The name of the file
+// @returns String a media type
 export let guess = (filename: String) => {
     match (lastIndexOf(".", filename)) {
         Some(extOffset) => {
