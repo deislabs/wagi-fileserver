@@ -1,0 +1,113 @@
+import String from "string"
+import Array from "array"
+import Option from "option"
+import Map from "map"
+import {lastIndexOf, reverse} from "./stringutil"
+
+let default_mt = "application/octet-stream"
+let mut mediatypes = Map.make()
+
+// Text formats
+Map.set("txt", "text/plain", mediatypes)
+Map.set("md", "text/plain", mediatypes)
+Map.set("mdown", "text/plain", mediatypes)
+Map.set("htm", "text/html", mediatypes)
+Map.set("html", "text/html", mediatypes)
+Map.set("xhtml", "application/xhtml+xml", mediatypes)
+Map.set("xml", "application/xml", mediatypes)
+Map.set("css", "text/css", mediatypes)
+Map.set("ics", "text/calendar", mediatypes)
+
+// Serialization formats
+Map.set("json", "application/json", mediatypes)
+Map.set("jsonld", "application/ld+json", mediatypes)
+Map.set("toml", "application/toml", mediatypes)
+Map.set("yaml", "application/yaml", mediatypes)
+
+// Applications
+// According to MSDN, prefered is text/javascript
+Map.set("js", "text/javascript", mediatypes)
+Map.set("mjs", "text/javascript", mediatypes)
+Map.set("wasm", "application/wasm", mediatypes)
+Map.set("csv", "text/csv", mediatypes)
+Map.set("sh", "application/x-sh", mediatypes)
+
+// Images
+Map.set("apng", "image/apng", mediatypes)
+Map.set("avif", "image/avif", mediatypes)
+Map.set("png", "image/png", mediatypes)
+Map.set("png", "image/png", mediatypes)
+Map.set("jpg", "image/jpeg", mediatypes)
+Map.set("jpeg", "image/jpeg", mediatypes)
+Map.set("pjpeg", "image/jpeg", mediatypes)
+Map.set("pjp", "image/jpeg", mediatypes)
+Map.set("jfif", "image/jpeg", mediatypes)
+Map.set("gif", "image/gif", mediatypes)
+Map.set("tif", "image/tiff", mediatypes)
+Map.set("tiff", "image/tiff", mediatypes)
+Map.set("webp", "image/webp", mediatypes)
+Map.set("svg", "image/svg+xml", mediatypes)
+Map.set("bmp", "image/bmp", mediatypes)
+Map.set("ico", "image/vnd.microsoft.icon", mediatypes)
+
+// Audio/Video
+Map.set("aac", "audio/aac", mediatypes)
+Map.set("avi", "video/x-msvideo", mediatypes)
+Map.set("wav", "audio/wave", mediatypes)
+Map.set("webm", "video/webm", mediatypes)
+Map.set("mp3", "audio/mpeg", mediatypes)
+Map.set("mp4", "video/mp4", mediatypes)
+Map.set("mpeg", "video/mpeg", mediatypes)
+Map.set("oga", "audio/ogg", mediatypes)
+Map.set("ogv", "video/ogg", mediatypes)
+Map.set("ogx", "application/ogg", mediatypes)
+Map.set("ts", "video/mp2t", mediatypes)
+
+// Compressed
+Map.set("bz2", "application/x-bzip2", mediatypes)
+Map.set("tbz", "application/x-bzip2", mediatypes)
+Map.set("tbz2", "application/x-bzip2", mediatypes)
+Map.set("gz", "application/gzip", mediatypes)
+Map.set("rar", "application/vnd.rar", mediatypes)
+Map.set("tar", "text/x-tar", mediatypes)
+Map.set("tgz", "application/gzip", mediatypes)
+Map.set("jar", "application/java-archive", mediatypes)
+Map.set("mpkg", "application/vnd.apple.installer+xml", mediatypes)
+Map.set("zip", "application/zip", mediatypes)
+Map.set("7z", "application/x-7z-compressed", mediatypes)
+
+// Binary
+Map.set("azw", "application/vnd.amazon.ebook", mediatypes)
+Map.set("bin", "application/octet-stream", mediatypes)
+Map.set("doc", "application/msword", mediatypes)
+Map.set("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", mediatypes)
+Map.set("epub", "application/epub+zip", mediatypes)
+Map.set("odp", "application/vnd.oasis.opendocument.presentation", mediatypes)
+Map.set("ods", "application/vnd.oasis.opendocument.spreadsheet", mediatypes)
+Map.set("odt", "application/vnd.oasis.opendocument.text", mediatypes)
+Map.set("pdf", "application/pdf", mediatypes)
+Map.set("ppt", "application/vnd.ms-powerpoint", mediatypes)
+Map.set("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", mediatypes)
+Map.set("rtf", "application/rtf", mediatypes)
+Map.set("vsd", "application/vnd.visio", mediatypes)
+Map.set("xls", "application/vnd.ms-excel", mediatypes)
+Map.set("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", mediatypes)
+
+// Fonts
+Map.set("eot", "application/vnd.ms-fontobject", mediatypes)
+Map.set("otf", "font/otf", mediatypes)
+Map.set("ttf", "font/ttf", mediatypes)
+Map.set("woff", "font/woff", mediatypes)
+Map.set("woff2", "font/woff2", mediatypes)
+
+// Guess the media type of this file
+// @param filename: The name of the file
+export let guess = (filename: String) => {
+    match (lastIndexOf(".", filename)) {
+        Some(extOffset) => {
+            let ext = String.slice(extOffset + 1, String.length(filename), filename)
+            Option.unwrapWithDefault(default_mt, Map.get(ext, mediatypes))
+        },
+        None => default_mt
+    }
+}

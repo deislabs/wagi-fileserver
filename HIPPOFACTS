@@ -1,0 +1,9 @@
+[bindle]
+name = "fileserver"
+version = "0.1.0"
+description = "Provides static file serving"
+
+[[handler]]
+route = "/static/..."
+name = "fileserver.gr.wasm"
+files = ["README.md", "LICENSE.txt"]

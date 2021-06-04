@@ -1,0 +1,40 @@
+import Env from "./env"
+import Util from "./stringutil"
+import String from "string"
+import Process from "sys/process"
+import File from "sys/file"
+
+let mut totalErr = 0
+
+let check = (a, b, msg: String) => {
+    match (a == b) {
+        true => Ok(String.concat("✅ PASS\t\t", msg)),
+        _  => {
+            totalErr += 1
+            Err(String.concat("⛔️ FAIL\t\t", msg))
+        }
+    }
+}
+
+let expect = (a, b, msg: String) => {
+    match (check(a, b, msg)) {
+        Ok(yay) => print(yay),
+        Err(e) => print(e)
+    }
+}
+
+let report = () => {
+    if (totalErr > 0) {
+        File.fdWrite(File.stderr, "❌ Total failed tests: ")
+        File.fdWrite(File.stderr, toString(totalErr))
+        File.fdWrite(File.stderr, "❌\n")
+        Process.exit(1)
+    }
+}
+
+expect(("a", "b"), Env.splitEnvVar("a=b"), "Env.splitEnvVar should parse")
+expect("gfedcba", Util.reverse("abcdefg"), "Util.reverse should reverse string")
+expect(Some(5), Util.lastIndexOf("..", "aaaa.."), "UtillastIndexOf should find Some")
+expect(None, Util.lastIndexOf("??", "aaaa.."), "Util.lastIndexOf should find None")
+
+report()
