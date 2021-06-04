@@ -121,3 +121,13 @@ SOFTWARE
 ```
 
 The fileserver took `/static/filserver.gr`, removed the `/static/` part from the front, and then loaded `fileserver.gr` from the directory mounted in the `modules.toml`. Note that any subdirectories are also served. So `/static/foo/bar` would translate to the path `foo/bar` inside of the WebAssembly module (which in the example above would fully resolve to "/path/to/fileserver/foo/bar").
+
+## Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of
+Conduct](https://opensource.microsoft.com/codeofconduct/).
+
+For more information see the [Code of Conduct
+FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
+[opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional
+questions or comments.
