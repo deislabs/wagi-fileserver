@@ -1,9 +1,9 @@
 import String from "string"
 import Process from "sys/process"
 import File from "sys/file"
-import Env from "./env"
-import Util from "./stringutil"
-import Mediatype from "./mediatype"
+import Env from "./lib/env"
+import Util from "./lib/stringutil"
+import Mediatype from "./lib/mediatype"
 
 let mut totalErr = 0
 

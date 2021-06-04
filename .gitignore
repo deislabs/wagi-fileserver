@@ -1,3 +1,4 @@
 /*.wasm
+lib/*.wasm
 target/
 _scratch/

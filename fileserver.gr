@@ -1,10 +1,11 @@
 // This is a simple Wagi static file server.
 
-import Env from "./env"
+import Env from "./lib/env"
 import Map from "map"
 import Option from "option"
 import File from "sys/file"
 import String from "string"
+import Mediatype from "./lib/mediatype"
 
 let serve = (path) => {
     File.fdWrite(File.stderr, "Fileserver: Loading file ")
@@ -26,7 +27,9 @@ let serve = (path) => {
         [],   
     )
 
-    File.fdWrite(File.stdout, "Content-Type: text/plain\n\n")
+    File.fdWrite(File.stdout, "Content-Type: ")
+    File.fdWrite(File.stdout, Mediatype.guess(path))
+    File.fdWrite(File.stdout, "\n\n")
     
     // Pipe output to STDOUT
     let rec pipe = (in, out) => {

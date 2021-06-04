@@ -2,7 +2,7 @@ import String from "string"
 import Array from "array"
 import Option from "option"
 import Map from "map"
-import {lastIndexOf, reverse} from "./stringutil"
+import {lastIndexOf, reverse} from "./lib/stringutil"
 
 export let default_mt = "application/octet-stream"
 
