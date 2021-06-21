@@ -45,10 +45,17 @@ let serve = (path) => {
 }
 
 let guestpath = (env) => {
-    let req = Option.unwrap(Map.get("PATH_INFO", env))
-    let matched = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
-    let base = Stringutil.beforeLast("/...", matched)
-    String.slice(String.length(base) + 1, String.length(req), req)
+    match (Map.get("X_RELATIVE_PATH", env)) {
+        Some(p) => p,
+        None => {
+            // Backwards compat until Wagi 0.1.0 is released
+            let req = Option.unwrap(Map.get("PATH_INFO", env))
+            let matched = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
+            let base = Stringutil.beforeLast("/...", matched)
+            String.slice(String.length(base) + 1, String.length(req), req)
+        }
+    }
+    
 }
 
 let notFound = () => {
