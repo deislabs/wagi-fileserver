@@ -51,7 +51,7 @@ let guestpath = (env) => {
     // Backward compat for an older version of Wagi that had PATH_INFO wrong.
     // X_RELATIVE_PATH was removed before Wagi 0.4
     match (Map.get("X_RELATIVE_PATH", env)) {
-        Some(p) => p,
+        Some(p) => String.concat("/", p),
         None => {
             Option.unwrap(Map.get("PATH_INFO", env))
         }
