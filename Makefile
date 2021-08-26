@@ -1,5 +1,5 @@
 # These are for both `run` (implicit) and `test` (explicit)
-PATH_INFO ?= /static/fileserver.gr
+PATH_INFO ?= /fileserver.gr
 X_MATCHED_ROUTE ?= /static/...
 BINDLE_SERVER_URL ?= http://localhost:8080/v1
 

@@ -8,7 +8,9 @@ import String from "string"
 import Mediatype from "./lib/mediatype"
 import Stringutil from "./lib/stringutil"
 
-let serve = (path) => {
+let serve = (abs_path) => {
+    // Trim the leading /
+    let path = String.slice(1, String.length(abs_path), abs_path)
     File.fdWrite(File.stderr, "Fileserver: Loading file ")
     File.fdWrite(File.stderr, path)
     File.fdWrite(File.stderr, "\n")
@@ -45,14 +47,13 @@ let serve = (path) => {
 }
 
 let guestpath = (env) => {
+
+    // Backward compat for an older version of Wagi that had PATH_INFO wrong.
+    // X_RELATIVE_PATH was removed before Wagi 0.4
     match (Map.get("X_RELATIVE_PATH", env)) {
-        Some(p) => p,
+        Some(p) => String.concat("/", p),
         None => {
-            // Backwards compat until Wagi 0.1.0 is released
-            let req = Option.unwrap(Map.get("PATH_INFO", env))
-            let matched = Option.unwrap(Map.get("X_MATCHED_ROUTE", env))
-            let base = Stringutil.beforeLast("/...", matched)
-            String.slice(String.length(base) + 1, String.length(req), req)
+            Option.unwrap(Map.get("PATH_INFO", env))
         }
     }
     
