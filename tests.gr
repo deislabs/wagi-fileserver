@@ -8,46 +8,83 @@ import Mediatype from "./lib/mediatype"
 let mut totalErr = 0
 
 let check = (a, b, msg: String) => {
-    match (a == b) {
-        true => Ok(String.concat("✅ PASS\t\t", msg)),
-        _  => {
-            totalErr += 1
-            print("===== Expected: =====")
-            print(a)
-            print("======= Got: ========")
-            print(b)
-            print("=====================")
-            Err(String.concat("⛔️ FAIL\t\t", msg))
-        }
-    }
+  match (a == b) {
+    true => Ok(String.concat("\226\156\133 PASS\t\t", msg)),
+    _ => {
+      totalErr += 1
+      print("===== Expected: =====")
+      print(a)
+      print("======= Got: ========")
+      print(b)
+      print("=====================")
+      Err(String.concat("\226\155\148\239\184\143 FAIL\t\t", msg))
+    },
+  }
 }
 
 let expect = (a, b, msg: String) => {
-    match (check(a, b, msg)) {
-        Ok(yay) => print(yay),
-        Err(e) => print(e)
-    }
+  match (check(a, b, msg)) {
+    Ok(yay) => print(yay),
+    Err(e) => print(e),
+  }
 }
 
 let report = () => {
-    if (totalErr > 0) {
-        File.fdWrite(File.stderr, "❌ Total failed tests: ")
-        File.fdWrite(File.stderr, toString(totalErr))
-        File.fdWrite(File.stderr, "❌\n")
-        Process.exit(1)
-    }
+  if (totalErr > 0) {
+    File.fdWrite(File.stderr, "\226\157\140 Total failed tests: ")
+    File.fdWrite(File.stderr, toString(totalErr))
+    File.fdWrite(File.stderr, "\226\157\140\n")
+    Process.exit(1)
+    void
+  }
 }
 
 expect(("a", "b"), Env.splitEnvVar("a=b"), "Env.splitEnvVar should parse")
 expect("gfedcba", Util.reverse("abcdefg"), "Util.reverse should reverse string")
-expect(Some(5), Util.lastIndexOf("/.", "aaaa/."), "Util.lastIndexOf should find Some")
-expect(Some(18), Util.lastIndexOf(".", "aaaa/fileserver.gr.wasm"), "Util.lastIndexOf should find last dot, not first dot")
-expect(Some(12), Util.lastIndexOf(".", "/.../aaaa/..."), "Util.lastIndexOf should find last set of three dots")
-expect(None, Util.lastIndexOf("??", "aaaa.."), "Util.lastIndexOf should find None")
-expect("test", Util.afterLast("$.$", "foo$.$bar$.$test"), "Util.afterLast should find last match")
-expect("/prefix/../path", Util.beforeLast("/..", "/prefix/../path/.."), "Util.beforeLast should return first part")
-expect("/prefix/../path/..", Util.beforeLast("/$$", "/prefix/../path/.."), "Util.beforeLast should return entire string when no match")
-expect("text/plain", Mediatype.guess("foo.txt"), "Mediatype.guess should find text/plain")
-expect("application/octet-stream", Mediatype.guess("foo.MADEUP"), "Mediatype.guess should find default type")
+expect(
+  Some(5),
+  Util.lastIndexOf("/.", "aaaa/."),
+  "Util.lastIndexOf should find Some",
+)
+expect(
+  Some(18),
+  Util.lastIndexOf(".", "aaaa/fileserver.gr.wasm"),
+  "Util.lastIndexOf should find last dot, not first dot",
+)
+expect(
+  Some(12),
+  Util.lastIndexOf(".", "/.../aaaa/..."),
+  "Util.lastIndexOf should find last set of three dots",
+)
+expect(
+  None,
+  Util.lastIndexOf("??", "aaaa.."),
+  "Util.lastIndexOf should find None",
+)
+expect(
+  "test",
+  Util.afterLast("$.$", "foo$.$bar$.$test"),
+  "Util.afterLast should find last match",
+)
+expect(
+  "/prefix/../path",
+  Util.beforeLast("/..", "/prefix/../path/.."),
+  "Util.beforeLast should return first part",
+)
+expect(
+  "/prefix/../path/..",
+  Util.beforeLast("/$$", "/prefix/../path/.."),
+  "Util.beforeLast should return entire string when no match",
+)
+expect(
+  "text/plain",
+  Mediatype.guess("foo.txt"),
+  "Mediatype.guess should find text/plain",
+)
+expect(
+  "application/octet-stream",
+  Mediatype.guess("foo.MADEUP"),
+  "Mediatype.guess should find default type",
+)
 
 report()

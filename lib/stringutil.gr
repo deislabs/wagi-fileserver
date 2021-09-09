@@ -1,50 +1,50 @@
 import String from "string"
 import Array from "array"
 
-// Return a String that is the reverse of the given String.
-//
-// @param str: The string to reverse.
-// @return String A reversed version of the given string
+/**
+ * Return a String that is the reverse of the given String.
+ *
+ * @param str: The string to reverse.
+ * @returns A reversed version of the given string
+ */
 export let reverse = (str: String) => {
-    let chars = String.explode(str)
-    let clen = Array.length(chars)
-    let rev = Array.init(clen, (index) => {
-        let last = clen - index - 1
-        chars[last]
-    })
-    String.implode(rev)
+  let chars = String.explode(str)
+  let rev = Array.reverse(chars)
+  String.implode(rev)
 }
 
-// Get the index of the last appearance of needle in the haystack.
-//
-// For a multi-character needle, this will return the end of that sequence,
-// not the beginning (as indexOf does).
-//
-// @param needle: The string to search for
-// @param haystack: The string to be searched
-// @return Option<Number> The offset, if found, or a number
+/**
+ * Get the index of the last appearance of needle in the haystack.
+ *
+ * For a multi-character needle, this will return the end of that sequence,
+ * not the beginning (as indexOf does).
+ *
+ * @param needle: The string to search for
+ * @param haystack: The string to be searched
+ * @returns The offset, if found, or a number
+ */
 export let lastIndexOf = (needle: String, haystack: String) => {
-    let rev = reverse(haystack)
-    let revNeedle = reverse(needle)
-    let nlen = String.length(needle)
-    let i = String.indexOf(revNeedle, rev)
-    match (i) {
-        Some(offset) => Some(String.length(haystack) - 1 - offset),
-        None => None,   
-    }
+  let rev = reverse(haystack)
+  let revNeedle = reverse(needle)
+  let nlen = String.length(needle)
+  let i = String.indexOf(revNeedle, rev)
+  match (i) {
+    Some(offset) => Some(((String.length(haystack)) - 1) - offset),
+    None => None,
+  }
 }
 
 export let afterLast = (needle: String, haystack: String) => {
-    match (lastIndexOf(needle, haystack)) {
-        Some(index) => String.slice(index + 1, String.length(haystack), haystack),
-        None => haystack
-    }
+  match (lastIndexOf(needle, haystack)) {
+    Some(index) => String.slice(index + 1, String.length(haystack), haystack),
+    None => haystack,
+  }
 }
 
 export let beforeLast = (needle: String, haystack: String) => {
-    let nlen = String.length(needle)
-    match (lastIndexOf(needle, haystack)) {
-        Some(index) => String.slice(0, index + 1 - nlen, haystack),
-        None => haystack
-    }
+  let nlen = String.length(needle)
+  match (lastIndexOf(needle, haystack)) {
+    Some(index) => String.slice(0, (index + 1) - nlen, haystack),
+    None => haystack,
+  }
 }

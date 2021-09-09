@@ -8,59 +8,83 @@ import String from "string"
 import Mediatype from "./lib/mediatype"
 import Stringutil from "./lib/stringutil"
 
-let serve = (abs_path) => {
-    // Trim the leading /
-    let path = String.slice(1, String.length(abs_path), abs_path)
-    File.fdWrite(File.stderr, "Fileserver: Loading file ")
-    File.fdWrite(File.stderr, path)
-    File.fdWrite(File.stderr, "\n")
-
-    // Open file
-    // TODO: This throws an error when something goes wrong.
-    // But Grain 0.3 does not have a try/catch yet.
-    // When we figure out how, we need to catch the error here
-    // and do a 404 or 500.
-    let input = File.pathOpen(
-        File.pwdfd,
-        [],
-        path,
-        [],
-        [File.FdRead],
-        [],
-        [],   
-    )
-
-    File.fdWrite(File.stdout, "Content-Type: ")
-    File.fdWrite(File.stdout, Mediatype.guess(path))
-    File.fdWrite(File.stdout, "\n\n")
-    
-    // Pipe output to STDOUT
-    let rec pipe = (in, out) => {
-        let (d, len) = File.fdRead(in, 1024)
-        File.fdWrite(out, d)
-        if (len > 0) {
-            pipe(in, out)
-        }
-    }
-    pipe(input, File.stdout)
-    File.fdClose(input)
-}
-
-let guestpath = (env) => {
-
-    // Backward compat for an older version of Wagi that had PATH_INFO wrong.
-    // X_RELATIVE_PATH was removed before Wagi 0.4
-    match (Map.get("X_RELATIVE_PATH", env)) {
-        Some(p) => String.concat("/", p),
-        None => {
-            Option.unwrap(Map.get("PATH_INFO", env))
-        }
-    }
-    
+let internalError = () => {
+  // Is stdout correct here?
+  let result = File.fdWrite(File.stdout, "Status: 500\n\nInternal Server Error")
+  match (result) {
+    Err(err) => {
+      // TODO: What do you do on a write error?
+      void
+    },
+    Ok(_nBytes) => void,
+  }
 }
 
 let notFound = () => {
-    File.fdWrite(File.stdout, "Status: 404\n\nNot Found")
+  let result = File.fdWrite(File.stdout, "Status: 404\n\nNot Found")
+  match (result) {
+    Err(err) => {
+      // TODO: What do you do on a write error?
+      void
+    },
+    Ok(_nBytes) => void,
+  }
+}
+
+// Pipe output to STDOUT
+let rec pipe = (in, out) => {
+  let res = File.fdRead(in, 1024)
+  match (res) {
+    Err(err) => {
+      // TODO: What to do on a read error?
+      void
+    },
+    Ok((d, len)) => {
+      // TODO: What should happen if this Result is an error
+      File.fdWrite(out, d)
+      if (len > 0) {
+        pipe(in, out)
+      }
+    },
+  }
+}
+
+let serve = abs_path => {
+  // Trim the leading /
+  let path = String.slice(1, String.length(abs_path), abs_path)
+  // TODO: What should happen if any of these Results are an error
+  File.fdWrite(File.stderr, "Fileserver: Loading file ")
+  File.fdWrite(File.stderr, path)
+  File.fdWrite(File.stderr, "\n")
+
+  // Open file
+  let result = File.pathOpen(File.pwdfd, [], path, [], [File.FdRead], [], [])
+
+  match (result) {
+    Err(_err) => notFound(),
+    Ok(input) => {
+      // TODO: What should happen if any of these Results are an error
+      File.fdWrite(File.stdout, "Content-Type: ")
+      File.fdWrite(File.stdout, Mediatype.guess(path))
+      File.fdWrite(File.stdout, "\n\n")
+
+      pipe(input, File.stdout)
+      // TODO: What should happen if this Result is an error
+      File.fdClose(input)
+      void
+    },
+  }
+}
+
+let guestpath = env => {
+  // Backward compat for an older version of Wagi that had PATH_INFO wrong.
+  // X_RELATIVE_PATH was removed before Wagi 0.4
+  match (Map.get("X_RELATIVE_PATH", env)) {
+    Some(p) => String.concat("/", p),
+    None => {
+      Option.unwrap(Map.get("PATH_INFO", env))
+    },
+  }
 }
 
 let kv = Env.envMap()
