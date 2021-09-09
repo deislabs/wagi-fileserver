@@ -28,3 +28,8 @@ test:
 .PHONY: push
 push:
 	hippofactory -s ${BINDLE_SERVER_URL} .
+
+doc: lib/*.gr
+	grain doc lib/env.gr -o lib/env.md
+	grain doc lib/mediatype.gr -o lib/mediatype.md
+	grain doc lib/stringutil.gr -o lib/stringutil.md
