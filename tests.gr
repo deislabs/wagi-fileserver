@@ -31,9 +31,9 @@ let expect = (a, b, msg: String) => {
 
 let report = () => {
   if (totalErr > 0) {
-    File.fdWrite(File.stderr, "\226\157\140 Total failed tests: ")
+    File.fdWrite(File.stderr, "❌ Total failed tests: ")
     File.fdWrite(File.stderr, toString(totalErr))
-    File.fdWrite(File.stderr, "\226\157\140\n")
+    File.fdWrite(File.stderr, "❌\n")
     Process.exit(1)
     void
   }
