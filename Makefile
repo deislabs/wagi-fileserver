@@ -34,8 +34,9 @@ doc: lib/*.gr
 	grain doc lib/mediatype.gr -o lib/mediatype.md
 	grain doc lib/stringutil.gr -o lib/stringutil.md
 
-fmt: fileserver.gr lib/*.gr
+fmt: *.gr lib/*.gr
 	grain format fileserver.gr --in-place
+	grain format tests.gr --in-place
 	grain format lib/env.gr --in-place
 	grain format lib/mediatype.gr --in-place
 	grain format lib/stringutil.gr --in-place
