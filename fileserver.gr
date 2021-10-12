@@ -5,45 +5,41 @@ import Map from "map"
 import Option from "option"
 import File from "sys/file"
 import String from "string"
+import Result from "result"
 import Mediatype from "./lib/mediatype"
 import Stringutil from "./lib/stringutil"
 
+// Utility wrapper around a Result.expect that ignores the return value
+// so we don't need to worry about things returning non-Void types
+let validateResult = (msg, res) => {
+  ignore(Result.expect(msg, res))
+}
+
 let internalError = () => {
-  // Is stdout correct here?
-  let result = File.fdWrite(File.stdout, "Status: 500\n\nInternal Server Error")
-  match (result) {
-    Err(err) => {
-      // TODO: What do you do on a write error?
-      void
-    },
-    Ok(_nBytes) => void,
-  }
+  validateResult(
+    "Unexpected error when writing Internal Server Error response",
+    File.fdWrite(File.stdout, "Status: 500\n\nInternal Server Error"),
+  )
 }
 
 let notFound = () => {
-  let result = File.fdWrite(File.stdout, "Status: 404\n\nNot Found")
-  match (result) {
-    Err(err) => {
-      // TODO: What do you do on a write error?
-      void
-    },
-    Ok(_nBytes) => void,
-  }
+  validateResult(
+    "Unexpected error when writing Not Found response",
+    File.fdWrite(File.stdout, "Status: 404\n\nNot Found"),
+  )
 }
 
 // Pipe output to STDOUT
 let rec pipe = (in, out) => {
   let res = File.fdRead(in, 1024)
   match (res) {
-    Err(err) => {
-      // TODO: What to do on a read error?
-      void
-    },
+    Err(err) => Err(err),
     Ok((d, len)) => {
-      // TODO: What should happen if this Result is an error
-      File.fdWrite(out, d)
+      let res = File.fdWrite(out, d)
       if (len > 0) {
         pipe(in, out)
+      } else {
+        res
       }
     },
   }
@@ -52,10 +48,9 @@ let rec pipe = (in, out) => {
 let serve = abs_path => {
   // Trim the leading /
   let path = String.slice(1, String.length(abs_path), abs_path)
-  // TODO: What should happen if any of these Results are an error
-  File.fdWrite(File.stderr, "Fileserver: Loading file ")
-  File.fdWrite(File.stderr, path)
-  File.fdWrite(File.stderr, "\n")
+  // Explicitly ignoring any Ok or Err that happens on this log
+  // The `ignore` can be removed if you don't want to be explicit about this behavior
+  ignore(File.fdWrite(File.stderr, "Fileserver: Loading file " ++ path ++ "\n"))
 
   // Open file
   let result = File.pathOpen(File.pwdfd, [], path, [], [File.FdRead], [], [])
@@ -63,15 +58,20 @@ let serve = abs_path => {
   match (result) {
     Err(_err) => notFound(),
     Ok(input) => {
-      // TODO: What should happen if any of these Results are an error
-      File.fdWrite(File.stdout, "Content-Type: ")
-      File.fdWrite(File.stdout, Mediatype.guess(path))
-      File.fdWrite(File.stdout, "\n\n")
+      validateResult(
+        "Unexpected error when writing Content-Type",
+        File.fdWrite(
+          File.stdout,
+          "Content-Type: " ++ Mediatype.guess(path) ++ "\n\n",
+        ),
+      )
 
-      pipe(input, File.stdout)
-      // TODO: What should happen if this Result is an error
-      File.fdClose(input)
-      void
+      validateResult(
+        "Unexpected error when streaming file body",
+        pipe(input, File.stdout),
+      )
+      // This validation may be able to be removed if it doesn't matter if the fdClose fails
+      validateResult("Unexpected error when closing file", File.fdClose(input))
     },
   }
 }
