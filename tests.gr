@@ -10,7 +10,7 @@ let mut totalErr = 0
 let check = (a, b, msg: String) => {
   match (a == b) {
     true => Ok(String.concat("✅ PASS\t\t", msg)),
-    _ => {
+    false => {
       totalErr += 1
       print("===== Expected: =====")
       print(a)
