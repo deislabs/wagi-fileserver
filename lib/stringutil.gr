@@ -29,7 +29,7 @@ export let lastIndexOf = (needle: String, haystack: String) => {
   let nlen = String.length(needle)
   let i = String.indexOf(revNeedle, rev)
   match (i) {
-    Some(offset) => Some(((String.length(haystack)) - 1) - offset),
+    Some(offset) => Some(String.length(haystack) - 1 - offset),
     None => None,
   }
 }
@@ -44,7 +44,7 @@ export let afterLast = (needle: String, haystack: String) => {
 export let beforeLast = (needle: String, haystack: String) => {
   let nlen = String.length(needle)
   match (lastIndexOf(needle, haystack)) {
-    Some(index) => String.slice(0, (index + 1) - nlen, haystack),
+    Some(index) => String.slice(0, index + 1 - nlen, haystack),
     None => haystack,
   }
 }
