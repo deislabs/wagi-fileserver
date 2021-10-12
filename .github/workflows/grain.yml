@@ -13,7 +13,7 @@ jobs:
       - uses: engineerd/configurator@v0.0.8
         with:
           name: "grain"
-          url: "https://github.com/grain-lang/grain/releases/download/grain-v0.4.2/grain-linux-x64"
+          url: "https://github.com/grain-lang/grain/releases/download/grain-v0.4.3/grain-linux-x64"
       - uses: engineerd/configurator@v0.0.8
         with:
           name: "wasmtime"
