@@ -5,62 +5,86 @@ import Map from "map"
 import Option from "option"
 import File from "sys/file"
 import String from "string"
+import Result from "result"
 import Mediatype from "./lib/mediatype"
 import Stringutil from "./lib/stringutil"
 
-let serve = (abs_path) => {
-    // Trim the leading /
-    let path = String.slice(1, String.length(abs_path), abs_path)
-    File.fdWrite(File.stderr, "Fileserver: Loading file ")
-    File.fdWrite(File.stderr, path)
-    File.fdWrite(File.stderr, "\n")
-
-    // Open file
-    // TODO: This throws an error when something goes wrong.
-    // But Grain 0.3 does not have a try/catch yet.
-    // When we figure out how, we need to catch the error here
-    // and do a 404 or 500.
-    let input = File.pathOpen(
-        File.pwdfd,
-        [],
-        path,
-        [],
-        [File.FdRead],
-        [],
-        [],   
-    )
-
-    File.fdWrite(File.stdout, "Content-Type: ")
-    File.fdWrite(File.stdout, Mediatype.guess(path))
-    File.fdWrite(File.stdout, "\n\n")
-    
-    // Pipe output to STDOUT
-    let rec pipe = (in, out) => {
-        let (d, len) = File.fdRead(in, 1024)
-        File.fdWrite(out, d)
-        if (len > 0) {
-            pipe(in, out)
-        }
-    }
-    pipe(input, File.stdout)
-    File.fdClose(input)
+// Utility wrapper around a Result.expect that ignores the return value
+// so we don't need to worry about things returning non-Void types
+let validateResult = (msg, res) => {
+  ignore(Result.expect(msg, res))
 }
 
-let guestpath = (env) => {
-
-    // Backward compat for an older version of Wagi that had PATH_INFO wrong.
-    // X_RELATIVE_PATH was removed before Wagi 0.4
-    match (Map.get("X_RELATIVE_PATH", env)) {
-        Some(p) => String.concat("/", p),
-        None => {
-            Option.unwrap(Map.get("PATH_INFO", env))
-        }
-    }
-    
+let internalError = () => {
+  validateResult(
+    "Unexpected error when writing Internal Server Error response",
+    File.fdWrite(File.stdout, "Status: 500\n\nInternal Server Error"),
+  )
 }
 
 let notFound = () => {
-    File.fdWrite(File.stdout, "Status: 404\n\nNot Found")
+  validateResult(
+    "Unexpected error when writing Not Found response",
+    File.fdWrite(File.stdout, "Status: 404\n\nNot Found"),
+  )
+}
+
+// Pipe output to STDOUT
+let rec pipe = (in, out) => {
+  let res = File.fdRead(in, 1024)
+  match (res) {
+    Err(err) => Err(err),
+    Ok((d, len)) => {
+      let res = File.fdWrite(out, d)
+      if (len > 0) {
+        pipe(in, out)
+      } else {
+        res
+      }
+    },
+  }
+}
+
+let serve = abs_path => {
+  // Trim the leading /
+  let path = String.slice(1, String.length(abs_path), abs_path)
+  // Explicitly ignoring any Ok or Err that happens on this log
+  // The `ignore` can be removed if you don't want to be explicit about this behavior
+  ignore(File.fdWrite(File.stderr, "Fileserver: Loading file " ++ path ++ "\n"))
+
+  // Open file
+  let result = File.pathOpen(File.pwdfd, [], path, [], [File.FdRead], [], [])
+
+  match (result) {
+    Err(_err) => notFound(),
+    Ok(input) => {
+      validateResult(
+        "Unexpected error when writing Content-Type",
+        File.fdWrite(
+          File.stdout,
+          "Content-Type: " ++ Mediatype.guess(path) ++ "\n\n",
+        ),
+      )
+
+      validateResult(
+        "Unexpected error when streaming file body",
+        pipe(input, File.stdout),
+      )
+      // This validation may be able to be removed if it doesn't matter if the fdClose fails
+      validateResult("Unexpected error when closing file", File.fdClose(input))
+    },
+  }
+}
+
+let guestpath = env => {
+  // Backward compat for an older version of Wagi that had PATH_INFO wrong.
+  // X_RELATIVE_PATH was removed before Wagi 0.4
+  match (Map.get("X_RELATIVE_PATH", env)) {
+    Some(p) => String.concat("/", p),
+    None => {
+      Option.unwrap(Map.get("PATH_INFO", env))
+    },
+  }
 }
 
 let kv = Env.envMap()

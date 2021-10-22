@@ -2,7 +2,7 @@ import String from "string"
 import Array from "array"
 import Option from "option"
 import Map from "map"
-import {lastIndexOf, reverse} from "./lib/stringutil"
+import { lastIndexOf, reverse } from "./stringutil"
 
 export let default_mt = "application/octet-stream"
 
@@ -82,18 +82,30 @@ Map.set("7z", "application/x-7z-compressed", mediatypes)
 Map.set("azw", "application/vnd.amazon.ebook", mediatypes)
 Map.set("bin", "application/octet-stream", mediatypes)
 Map.set("doc", "application/msword", mediatypes)
-Map.set("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", mediatypes)
+Map.set(
+  "docx",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  mediatypes,
+)
 Map.set("epub", "application/epub+zip", mediatypes)
 Map.set("odp", "application/vnd.oasis.opendocument.presentation", mediatypes)
 Map.set("ods", "application/vnd.oasis.opendocument.spreadsheet", mediatypes)
 Map.set("odt", "application/vnd.oasis.opendocument.text", mediatypes)
 Map.set("pdf", "application/pdf", mediatypes)
 Map.set("ppt", "application/vnd.ms-powerpoint", mediatypes)
-Map.set("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", mediatypes)
+Map.set(
+  "pptx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  mediatypes,
+)
 Map.set("rtf", "application/rtf", mediatypes)
 Map.set("vsd", "application/vnd.visio", mediatypes)
 Map.set("xls", "application/vnd.ms-excel", mediatypes)
-Map.set("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", mediatypes)
+Map.set(
+  "xlsx",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  mediatypes,
+)
 
 // Fonts
 Map.set("eot", "application/vnd.ms-fontobject", mediatypes)
@@ -102,19 +114,21 @@ Map.set("ttf", "font/ttf", mediatypes)
 Map.set("woff", "font/woff", mediatypes)
 Map.set("woff2", "font/woff2", mediatypes)
 
-// Guess the media type of this file
-//
-// Per recommendation, if no media type is found for an extension,
-// this returns `application/octet-stream`.
-//
-// @param filename: The name of the file
-// @returns String a media type
+/**
+ * Guess the media type of this file
+ *
+ * Per recommendation, if no media type is found for an extension,
+ * this returns `application/octet-stream`.
+ *
+ * @param filename: The name of the file
+ * @returns A media type
+ */
 export let guess = (filename: String) => {
-    match (lastIndexOf(".", filename)) {
-        Some(extOffset) => {
-            let ext = String.slice(extOffset + 1, String.length(filename), filename)
-            Option.unwrapWithDefault(default_mt, Map.get(ext, mediatypes))
-        },
-        None => default_mt
-    }
+  match (lastIndexOf(".", filename)) {
+    Some(extOffset) => {
+      let ext = String.slice(extOffset + 1, String.length(filename), filename)
+      Option.unwrapWithDefault(default_mt, Map.get(ext, mediatypes))
+    },
+    None => default_mt,
+  }
 }
