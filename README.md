@@ -138,7 +138,7 @@ SOFTWARE
 
 The fileserver took `/static/filserver.gr`, removed the `/static/` part from the front, and then loaded `fileserver.gr` from the directory mounted in the `modules.toml`. Note that any subdirectories are also served. So `/static/foo/bar` would translate to the path `foo/bar` inside of the WebAssembly module (which in the example above would fully resolve to "/path/to/fileserver/foo/bar").
 
-## Prefiing a Path
+## Prefixing a Path
 
 `PATH_PREFIX` is an environment variable you can set.
 This allows you to add `-e PATH_PREFIX=/some/prefix` as an env var to `fileserver.gr.wasm`.
