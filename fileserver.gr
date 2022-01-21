@@ -45,9 +45,17 @@ let rec pipe = (in, out) => {
   }
 }
 
-let serve = abs_path => {
-  // Trim the leading /
-  let path = String.slice(1, String.length(abs_path), abs_path)
+let serve = (abs_path, env) => {
+  // If PATH_PREFIX is set, then the path prefix is prepended onto the incoming path.
+  // This allows you to map to a directory that does not match the directory name in the URL.
+  let path = match (Map.get("PATH_PREFIX", env)) {
+    Some(prefix) => {
+      let tmp = String.slice(1, String.length(abs_path), abs_path)
+      String.concat(prefix, tmp)
+    },
+    // If no env var, trim off just the leading /
+    None => String.slice(1, String.length(abs_path), abs_path)
+  }
   // Explicitly ignoring any Ok or Err that happens on this log
   // The `ignore` can be removed if you don't want to be explicit about this behavior
   ignore(File.fdWrite(File.stderr, "Fileserver: Loading file " ++ path ++ "\n"))
@@ -89,4 +97,4 @@ let guestpath = env => {
 
 let kv = Env.envMap()
 let pathInfo = guestpath(kv)
-serve(pathInfo)
+serve(pathInfo, kv)
