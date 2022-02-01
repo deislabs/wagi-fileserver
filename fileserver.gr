@@ -45,6 +45,43 @@ let rec pipe = (in, out) => {
   }
 }
 
+// Determine cache control values.
+let cache_duration = (env, mtype) => {
+  let default_cache_control = match (Map.get("CACHE_CONTROL", env)) {
+    Some(val) => val,
+    None => "no-cache",
+  }
+
+  if (String.indexOf("image/", mtype) == Some(0)) {
+    match (Map.get("IMAGE_CACHE_CONTROL", env)) {
+      Some(val) => val,
+      None => default_cache_control,
+    }
+  } else if (String.indexOf("font/", mtype) == Some(0)) {
+    match (Map.get("FONT_CACHE_CONTROL", env)) {
+      Some(val) => val,
+      None => default_cache_control,
+    }
+  } else if (String.indexOf("text/css", mtype) == Some(0)) {
+    match (Map.get("CSS_CACHE_CONTROL", env)) {
+      Some(val) => val,
+      None => default_cache_control,
+    }
+  } else if (String.indexOf("text/javascript", mtype) == Some(0)) {
+    match (Map.get("JS_CACHE_CONTROL", env)) {
+      Some(val) => val,
+      None => default_cache_control,
+    }
+  } else {
+    default_cache_control
+  }
+}
+
+let headers = (env, path) => {
+  let mtype = Mediatype.guess(path);
+  "Content-Type: " ++ mtype ++ "\nCache-Control: " ++ cache_duration(env, mtype) ++ "\n\n"
+}
+
 let serve = (abs_path, env) => {
   // If PATH_PREFIX is set, then the path prefix is prepended onto the incoming path.
   // This allows you to map to a directory that does not match the directory name in the URL.
@@ -70,7 +107,7 @@ let serve = (abs_path, env) => {
         "Unexpected error when writing Content-Type",
         File.fdWrite(
           File.stdout,
-          "Content-Type: " ++ Mediatype.guess(path) ++ "\n\n",
+          headers(env, path),
         ),
       )
 
@@ -83,6 +120,8 @@ let serve = (abs_path, env) => {
     },
   }
 }
+
+
 
 let guestpath = env => {
   // Backward compat for an older version of Wagi that had PATH_INFO wrong.
