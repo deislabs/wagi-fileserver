@@ -90,6 +90,18 @@ volumes = {"/" = "/path/to/fileserver"}
 
 The above configures Wagi to map the path `/static/...` to the `fileserver.gr.wasm` module. Then it serves all of the files in this project.
 
+### Environment Variables
+
+The following environment variables can be passed via Wagi's `-e` flag:
+
+- `CACHE_CONTROL`: The string value of a cache-control header. If not specified, this will set cache-control to `no-cache`. Google recommends setting this value to `CACHE_CONTROL="max-age=31536000"` (cache for up to 1 year).
+- Type-specific cache controls can be set using the following env vars (all of which default to `CACHE_CONTROL` if not set):
+    - `CSS_CACHE_CONTROL`
+    - `FONT_CACHE_CONTROL`
+    - `IMAGE_CACHE_CONTROL`
+    - `JS_CACHE_CONTROL`
+
+
 ### Testing the Static Fileserver with `curl`
 
 This step is the same whether you use Bindle or a `modules.toml`.
