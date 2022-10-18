@@ -1,0 +1,19 @@
+# Define a basic HTTP app
+spin_version = "1"
+name = "wagi-fileserver"
+trigger = { type = "http", base = "/" }
+version = "1.0.3"
+
+# Attach our `example.wasm` file to this app
+[[component]]
+id = "wagi-fileserver"
+source = "fileserver.gr.wasm"
+files = ["static/*"]
+[component.environment]
+PATH_PREFIX = "static/"
+CACHE_CONTROL = "max-age=31536000"
+[component.trigger]
+route = "/..."
+executor = { type = "wagi" }
+[component.build]
+command = "grain compile fileserver.gr"

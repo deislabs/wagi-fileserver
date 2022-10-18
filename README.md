@@ -56,6 +56,16 @@ You have two options for running in Wagi:
 1. Use [hippofactory](https://github.com/deislabs/hippofactory) to build and push a bindle, then use `wagi -b $YOUR_BINDLE`
 2. Write a `modules.toml` file and use `wagi -c modules.toml`.
 
+## Running in [Spin](https://spin.fermyon.dev)
+
+You can build with `spin build`.
+
+To run:
+1. `spin up` or `spin build --up`
+2. Point your browser to http://localhost:3000/index.html
+
+Assuming your production target is set, you can deploy with `spin deploy`.
+
 ### Using `hippofactory`
 
 Edit the `HIPPOFACTS` file to taste.
@@ -92,8 +102,9 @@ The above configures Wagi to map the path `/static/...` to the `fileserver.gr.wa
 
 ### Environment Variables
 
-The following environment variables can be passed via Wagi's `-e` flag:
+The following environment variables can be passed via Wagi's `-e` flag or in Spin's `[component.environment]`:
 
+- `PATH_PREFIX`: The prefix that should be added before the query path. Example: `PATH_PREFIX = "static/"`
 - `CACHE_CONTROL`: The string value of a cache-control header. If not specified, this will set cache-control to `no-cache`. Google recommends setting this value to `CACHE_CONTROL="max-age=31536000"` (cache for up to 1 year).
 - Type-specific cache controls can be set using the following env vars (all of which default to `CACHE_CONTROL` if not set):
     - `CSS_CACHE_CONTROL`
